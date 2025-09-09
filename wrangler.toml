@@ -1,0 +1,5 @@
+name = "gateway"
+main = "src/worker.js"
+compatibility_date = "2024-09-09"
+
+# optional: kalau perlu KV/Secrets bisa taruh di sini
