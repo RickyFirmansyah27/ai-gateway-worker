@@ -1,6 +1,10 @@
 export const config = {
   apis: {
     clientApiKey: 'CLIENT_API_KEY',
+    gemini: {
+      key: 'GEMINI_API_KEY',
+      url: 'https://generativelanguage.googleapis.com/v1beta'
+    }
   },
   routes: {
     chatCompletions: '/v1/chat/completions',
@@ -15,6 +19,10 @@ export const config = {
       modelId: '@cf/black-forest-labs/flux-1-schnell',
       displayName: 'imaginary-v1-instruct',
     },
+    web_search: {
+      modelId: 'gemini-2.5-pro',
+      displayName: 'imaginary-v1-instruct',
+    },
   },
   defaults: {
     chat: {
@@ -25,6 +33,12 @@ export const config = {
       frequencyPenalty: 0,
     },
     image: {
+      width: 1024,
+      height: 1024,
+      steps: 4,
+      guidance: 3.5,
+    },
+    imageV2: {
       width: 1024,
       height: 1024,
       steps: 4,
