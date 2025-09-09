@@ -29,12 +29,12 @@ export async function handleWebSearchChatCompletions(request, env) {
 
   const tools = [{ "google_search": {} }];
   const tool_choice = { "function": "google_search" };
-
+  const API_KEY = env[config.apis.gemini.key];
   const response = await fetch(config.apis.gemini.url + '/openai/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${env.GEMINI_API_KEY}`
+      'Authorization': `Bearer ${API_KEY}`
     },
     body: JSON.stringify({
       model,
