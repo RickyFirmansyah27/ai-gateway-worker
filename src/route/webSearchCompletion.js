@@ -51,13 +51,19 @@ export async function handleWebSearchChatCompletions(request, env) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: { message: 'Gemini API error' } }));
-    return json({ error: { message: errorData.error.message || 'Gemini API error' } }, response.status);
+    const errorMessage = errorData?.error?.message || 'Imaginary API error';
+    return json({ error: { message: errorMessage } }, response.status);
   }
 
-  const data = await response.json();
-  const message = data.choices?.[0]?.message || {};
+  let data;
+  try {
+    data = await response.json();
+  } catch (e) {
+    // Fallback for invalid JSON in success response
+    data = {};
+  }
+  const message = data?.choices?.[0]?.message || {};
   const generatedText = message.content || '';
-  const tool_calls = message.tool_calls || [];
 
   // Estimate tokens
   const promptText = sanitizedMessages.map(m => m.content).join(" ");
@@ -75,8 +81,7 @@ export async function handleWebSearchChatCompletions(request, env) {
         index: 0,
         message: {
           role: "assistant",
-          content: generatedText,
-          ...(tool_calls.length > 0 ? { tool_calls: tool_calls } : {}),
+          content: data,
         },
         finish_reason: data.choices?.[0]?.finish_reason || "stop",
       },
