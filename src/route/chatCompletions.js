@@ -1,9 +1,10 @@
 import { SystemPromptModel } from '../helper/sytem-prompt.js';
 import { estimateTokens, json } from '../helper/utils.js';
+import { config } from '../config/config.js';
 
 export async function handleChatCompletions(request, env) {
   const body = await request.json();
-  const model = body.model || "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+  const model = body.model || config.models.text.modelId;
   const messages = body.messages;
 
   if (!messages || !Array.isArray(messages)) {
@@ -13,7 +14,7 @@ export async function handleChatCompletions(request, env) {
   // ✅ System prompt yang dipush
   const systemPrompt = {
     role: "system",
-    content: SystemPromptModel("imaginary-v1-instruct")
+    content: SystemPromptModel(config.models.text.displayName)
   };
 
   const sanitizedMessages = [
@@ -28,11 +29,11 @@ export async function handleChatCompletions(request, env) {
 
   const options = {
     messages: sanitizedMessages,
-    max_tokens: body.max_tokens || 8129,
-    temperature: body.temperature ?? 0.7,
-    top_p: body.top_p ?? 1,
-    presence_penalty: body.presence_penalty ?? 0,
-    frequency_penalty: body.frequency_penalty ?? 0,
+    max_tokens: body.max_tokens || config.defaults.chat.maxTokens,
+    temperature: body.temperature ?? config.defaults.chat.temperature,
+    top_p: body.top_p ?? config.defaults.chat.topP,
+    presence_penalty: body.presence_penalty ?? config.defaults.chat.presencePenalty,
+    frequency_penalty: body.frequency_penalty ?? config.defaults.chat.frequencyPenalty,
   };
 
   // 🧠 Call Cloudflare AI model default
@@ -49,7 +50,7 @@ export async function handleChatCompletions(request, env) {
     id: "chatcmpl-" + crypto.randomUUID(),
     object: "chat.completion",
     created: Math.floor(Date.now() / 1000),
-    model: "imaginary-v1-instruct",
+    model: config.models.text.displayName,
     choices: [
       {
         index: 0,

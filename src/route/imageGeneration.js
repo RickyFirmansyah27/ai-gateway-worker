@@ -1,8 +1,9 @@
 import { json } from '../helper/utils.js';
+import { config } from '../config/config.js';
 
 export async function handleImageGeneration(request, env) {
   const body = await request.json();
-  const model = "@cf/black-forest-labs/flux-1-schnell";
+  const model = config.models.image.modelId;
 
   // ambil semua field
   const {
@@ -29,10 +30,10 @@ export async function handleImageGeneration(request, env) {
   const payload = {
     prompt,
     seed: seed ?? Math.floor(Math.random() * 10000),
-    width: width ?? 512,
-    height: height ?? 512,
-    steps: steps ?? 4,           // Flux Schnell biasanya 4 steps sudah bagus
-    guidance: guidance ?? 3.5,   // CFG scale
+    width: width ?? config.defaults.image.width,
+    height: height ?? config.defaults.image.height,
+    steps: steps ?? config.defaults.image.steps,           // Flux Schnell biasanya 4 steps sudah bagus
+    guidance: guidance ?? config.defaults.image.guidance,   // CFG scale
     negative_prompt: negative_prompt ?? "" // opsional
   };
 
@@ -44,7 +45,7 @@ export async function handleImageGeneration(request, env) {
       id: "imggen-" + crypto.randomUUID(),
       object: "image",
       created: Math.floor(Date.now() / 1000),
-      model: "imaginary-v1-instruct",
+      model: config.models.image.displayName,
       params_used: payload, // 👍 kasih tau user param yg kepake
       data:
         {
