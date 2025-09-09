@@ -1,17 +1,17 @@
 import { json } from './src/helper/utils.js';
-import { config } from './src/config/config.js';
+import { config } from './src/config/global-config.js';
 import { handleRoute } from './src/route/index.js';
 
 export default {
   async fetch(request, env) {
-    const API_KEY = env[config.apis.clientApiKey];
+    // const API_KEY = env[config.apis.clientApiKey];
 
-    const auth = request.headers.get("Authorization");
+    // const auth = request.headers.get("Authorization");
 
-    // 🔐 API key check
-    if (auth !== `Bearer ${API_KEY}`) {
-      return json({ error: { message: "Unauthorized" } }, 401);
-    }
+    // // 🔐 API key check
+    // if (auth !== `Bearer ${API_KEY}`) {
+    //   return json({ error: { message: "Unauthorized" } }, 401);
+    // }
 
     try {
       // 🚫 Only allow POST

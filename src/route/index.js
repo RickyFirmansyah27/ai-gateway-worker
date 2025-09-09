@@ -2,7 +2,7 @@ import { json } from '../helper/utils.js';
 import { handleChatCompletions } from './chatCompletions.js';
 import { handleWebSearchChatCompletions } from './webSearchCompletion.js';
 import { handleImageGeneration } from './imageGeneration.js';
-import { config } from '../config/config.js';
+import { config } from '../config/global-config.js';
 
 export async function handleRoute(request, env) {
   const url = new URL(request.url);

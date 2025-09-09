@@ -1,5 +1,6 @@
 import { json } from '../helper/utils.js';
-import { config } from '../config/config.js';
+import { config } from '../config/global-config.js';
+import { uploadImageFromBase64 } from '../service/imageKit.js';
 
 export async function handleImageGeneration(request, env) {
   const body = await request.json();
@@ -40,17 +41,25 @@ export async function handleImageGeneration(request, env) {
   try {
     const aiResponse = await env.AI.run(model, payload);
 
+    const uploadResult = await uploadImageFromBase64(aiResponse.image, env);
+    if (uploadResult.error) {
+      return json({
+        error: {
+          message: uploadResult.error
+        }
+      }, 500);
+    }
 
+    // Kembalikan response dengan URL publik jika berhasil
     return json({
       id: "imggen-" + crypto.randomUUID(),
-      object: "image",
+      object: "image_url",
       created: Math.floor(Date.now() / 1000),
       model: config.models.image.displayName,
-      params_used: payload, // 👍 kasih tau user param yg kepake
+      params_used: payload,
       data:
         {
-
-          base64: aiResponse.image
+          url: uploadResult.url
         }
     });
   } catch (err) {

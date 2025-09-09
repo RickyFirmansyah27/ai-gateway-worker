@@ -1,6 +1,6 @@
 import { SystemPromptModel } from '../helper/sytem-prompt.js';
 import { estimateTokens, json } from '../helper/utils.js';
-import { config } from '../config/config.js';
+import { config } from '../config/global-config.js';
 
 export async function handleChatCompletions(request, env) {
   const body = await request.json();

@@ -1,6 +1,6 @@
 import { SystemPromptModel } from '../helper/sytem-prompt.js';
 import { json } from '../helper/utils.js';
-import { config } from '../config/config.js';
+import { config } from '../config/global-config.js';
 
 export async function handleWebSearchChatCompletions(request, env) {
   try {
