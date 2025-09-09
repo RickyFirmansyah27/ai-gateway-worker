@@ -27,8 +27,26 @@ export async function handleWebSearchChatCompletions(request, env) {
     })),
   ];
 
-  const tools = [{ "google_search": {} }];
-  const tool_choice = { "function": "google_search" };
+  const tools = [
+    {
+      "type": "function",
+      "function": {
+        "name": "searchGoogle",
+        "description": "Search using Google",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The search query"
+            }
+          },
+          "required": ["query"]
+        }
+      }
+    }
+  ];
+  const tool_choice = { "function": { "name": "searchGoogle" } };
   const API_KEY = env[config.apis.gemini.key];
   const response = await fetch(config.apis.gemini.url + '/openai/chat/completions', {
     method: 'POST',
@@ -55,13 +73,7 @@ export async function handleWebSearchChatCompletions(request, env) {
     return json({ error: { message: errorMessage } }, response.status);
   }
 
-  let data;
-  try {
-    data = await response.json();
-  } catch (e) {
-    // Fallback for invalid JSON in success response
-    data = {};
-  }
+  const data = await response.json();
   const message = data?.choices?.[0]?.message || {};
   const generatedText = message.content || '';
 

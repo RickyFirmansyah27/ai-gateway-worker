@@ -17,7 +17,7 @@ export async function handleRoute(request, env) {
         return json({ error: { message: "Invalid JSON in request body" } }, 400);
       }
       const newRequest = new Request(request.url, { method: request.method, headers: request.headers, body: JSON.stringify(body) });
-      const handler = (body.webSearch === true) ? handleWebSearchChatCompletions : handleChatCompletions;
+      const handler = (body.web_search === true) ? handleWebSearchChatCompletions : handleChatCompletions;
       return await handler(newRequest, env);
     }
     case config.routes.imageGeneration: {
