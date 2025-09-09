@@ -4,7 +4,7 @@ export const config = {
     gemini: {
       key: 'GEMINI_API_KEY',
       url: 'https://generativelanguage.googleapis.com/v1beta'
-    }
+    },
   },
   routes: {
     chatCompletions: '/v1/chat/completions',
@@ -20,7 +20,7 @@ export const config = {
       displayName: 'imaginary-v1-instruct',
     },
     web_search: {
-      modelId: 'gemini-2.5-pro',
+      modelId: 'models/gemini-2.5-pro',
       displayName: 'imaginary-v1-instruct',
     },
   },
