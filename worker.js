@@ -1,12 +1,11 @@
 import { json } from './src/helper/utils.js';
-import { handleChatCompletions } from './src/route/chatCompletions.js';
-import { handleImageGeneration } from './src/route/imageGeneration.js';
 import { config } from './src/config/config.js';
+import { handleRoute } from './src/route/index.js';
 
 export default {
   async fetch(request, env) {
     const API_KEY = env[config.apis.clientApiKey];
-    const url = new URL(request.url);
+
     const auth = request.headers.get("Authorization");
 
     // 🔐 API key check
@@ -20,18 +19,7 @@ export default {
         return json({ error: { message: "Only POST allowed" } }, 405);
       }
 
-      // 📝 Chat Completion
-      if (url.pathname === config.routes.chatCompletions) {
-        return await handleChatCompletions(request, env);
-      }
-
-      // 🎨 Image Generation
-      if (url.pathname === config.routes.imageGeneration) {
-        return await handleImageGeneration(request, env);
-      }
-
-      // ❌ Not allowed path
-      return json({ error: { message: "Not allowed path" } }, 404);
+      return await handleRoute(request, env);
     } catch (err) {
       return json({ error: { message: err.message } }, 500);
     }
