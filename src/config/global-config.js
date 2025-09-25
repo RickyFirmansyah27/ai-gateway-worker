@@ -12,7 +12,7 @@ export const config = {
   routes: {
     chatCompletions: '/v1/chat/completions',
     imageGeneration: '/v1/generation',
-    imageGenerationV2: '/v1/generation/v2',
+    imageGenerationV2: '/v2/generation',
   },
   models: {
     text: {

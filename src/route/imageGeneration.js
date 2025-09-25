@@ -1,4 +1,4 @@
-import { json } from '../helper/utils.js';
+import { json, handleBinaryImageResponse } from '../helper/utils.js';
 import { config } from '../config/global-config.js';
 import { uploadImageFromBase64 } from '../service/imageKit.js';
 
@@ -104,6 +104,8 @@ export async function handleImageGenerationV2(request, env) {
 
   try {
     const CHUTES_TOKEN = env[config.apis.chutes.token];
+    console.log("sending request to Chutes with payload:", payload);
+
     const chutesResponse = await fetch('https://image.chutes.ai/generate', {
       method: 'POST',
       headers: {
@@ -122,10 +124,12 @@ export async function handleImageGenerationV2(request, env) {
       }, 500);
     }
 
-    const chutesData = await chutesResponse.json();
-    const imageBase64 = chutesData[0]?.data;
+    // Handle binary response from Chutes API using helper function
+    const imageBase64 = await handleBinaryImageResponse(chutesResponse);
 
+    console.log("Uploading image to ImageKit...");
     const uploadResult = await uploadImageFromBase64(imageBase64, env);
+
     if (uploadResult.error) {
       return json({
         error: {
