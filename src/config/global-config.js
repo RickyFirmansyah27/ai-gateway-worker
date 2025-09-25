@@ -43,14 +43,14 @@ export const config = {
     image: {
       width: 1024,
       height: 1024,
-      steps: 4,
-      guidance: 3.5,
+      steps: 24,
+      guidance: 7,
     },
     imageV2: {
       width: 1024,
       height: 1024,
-      steps: 4,
-      guidance: 3.5,
+      steps: 50,
+      guidance: 7.5,
     },
   },
 };
