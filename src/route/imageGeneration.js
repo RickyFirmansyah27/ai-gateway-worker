@@ -117,7 +117,7 @@ export async function handleImageGenerationV2(request, env) {
       const errorText = await chutesResponse.text();
       return json({
         error: {
-          message: `Chutes AI API error: ${chutesResponse.status} ${errorText}`
+          message: `AI API error: ${chutesResponse.status} ${errorText}`
         }
       }, 500);
     }
