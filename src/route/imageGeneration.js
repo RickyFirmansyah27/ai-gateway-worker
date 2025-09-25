@@ -93,7 +93,7 @@ export async function handleImageGenerationV2(request, env) {
 
   // set default value
   const payload = {
-    model: model ?? "chroma",
+    model: config.models.imagev2.modelId,
     prompt,
     negative_prompt: negative_prompt ?? "blur, distortion, low quality",
     guidance_scale: guidance_scale ?? 7.5,
@@ -139,7 +139,7 @@ export async function handleImageGenerationV2(request, env) {
       id: "imggenv2-" + crypto.randomUUID(),
       object: "image_url",
       created: Math.floor(Date.now() / 1000),
-      model: "chroma",
+      model: config.models.imagev2.displayName,
       params_used: payload,
       data: {
         url: uploadResult.url

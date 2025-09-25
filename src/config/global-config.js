@@ -23,6 +23,10 @@ export const config = {
       modelId: '@cf/black-forest-labs/flux-1-schnell',
       displayName: 'imaginary-v1-instruct',
     },
+    imagev2: {
+      modelId: 'chroma',
+      displayName: 'imaginary-v2-instruct',
+    },
     web_search: {
       modelId: 'models/gemini-2.5-pro',
       displayName: 'imaginary-v1-instruct',
