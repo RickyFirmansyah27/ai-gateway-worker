@@ -123,8 +123,7 @@ export async function handleImageGenerationV2(request, env) {
     }
 
     const chutesData = await chutesResponse.json();
-    // Asumsikan response berisi image base64 di chutesData.image
-    const imageBase64 = chutesData.image;
+    const imageBase64 = chutesData[0]?.data;
 
     const uploadResult = await uploadImageFromBase64(imageBase64, env);
     if (uploadResult.error) {
