@@ -1,7 +1,7 @@
 import { json } from '../helper/utils.js';
 import { handleChatCompletions } from './chatCompletions.js';
 import { handleWebSearchChatCompletions } from './webSearchCompletion.js';
-import { handleImageGeneration } from './imageGeneration.js';
+import { handleImageGeneration, handleImageGenerationV2 } from './imageGeneration.js';
 import { config } from '../config/global-config.js';
 
 export async function handleRoute(request, env) {
@@ -22,6 +22,9 @@ export async function handleRoute(request, env) {
     }
     case config.routes.imageGeneration: {
       return await handleImageGeneration(request, env);
+    }
+    case config.routes.imageGenerationV2: {
+      return await handleImageGenerationV2(request, env);
     }
     default: {
       return json({ error: { message: "Not allowed path" } }, 404);

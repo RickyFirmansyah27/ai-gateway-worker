@@ -5,10 +5,14 @@ export const config = {
       key: 'GEMINI_API_KEY',
       url: 'https://generativelanguage.googleapis.com/v1beta'
     },
+    chutes: {
+      token: 'CHUTES_API_TOKEN'
+    },
   },
   routes: {
     chatCompletions: '/v1/chat/completions',
     imageGeneration: '/v1/generation',
+    imageGenerationV2: '/v1/generation/v2',
   },
   models: {
     text: {

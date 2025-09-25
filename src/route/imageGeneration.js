@@ -66,3 +66,87 @@ export async function handleImageGeneration(request, env) {
     return json({ error: { message: err.message } }, 500);
   }
 }
+
+export async function handleImageGenerationV2(request, env) {
+  const body = await request.json();
+
+  // ambil semua field
+  const {
+    model,
+    prompt,
+    negative_prompt,
+    guidance_scale,
+    width,
+    height,
+    num_inference_steps
+  } = body;
+
+  // cek prompt wajib
+  if (!prompt || typeof prompt !== "string" || prompt.trim() === "") {
+    return json({
+      error: {
+        message:
+          "Missing required field: 'prompt'. Example body: { \"prompt\": \"A beautiful sunset over mountains\", \"model\": \"chroma\", \"width\": 1024, \"height\": 1024 }"
+      }
+    }, 400);
+  }
+
+  // set default value
+  const payload = {
+    model: model ?? "chroma",
+    prompt,
+    negative_prompt: negative_prompt ?? "blur, distortion, low quality",
+    guidance_scale: guidance_scale ?? 7.5,
+    width: width ?? config.defaults.imageV2.width,
+    height: height ?? config.defaults.imageV2.height,
+    num_inference_steps: num_inference_steps ?? config.defaults.imageV2.steps
+  };
+
+  try {
+    const CHUTES_TOKEN = env[config.apis.chutes.token];
+    const chutesResponse = await fetch('https://image.chutes.ai/generate', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${CHUTES_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!chutesResponse.ok) {
+      const errorText = await chutesResponse.text();
+      return json({
+        error: {
+          message: `Chutes AI API error: ${chutesResponse.status} ${errorText}`
+        }
+      }, 500);
+    }
+
+    const chutesData = await chutesResponse.json();
+    // Asumsikan response berisi image base64 di chutesData.image
+    const imageBase64 = chutesData.image;
+
+    const uploadResult = await uploadImageFromBase64(imageBase64, env);
+    if (uploadResult.error) {
+      return json({
+        error: {
+          message: uploadResult.error
+        }
+      }, 500);
+    }
+
+    // Kembalikan response dengan URL publik jika berhasil
+    return json({
+      id: "imggenv2-" + crypto.randomUUID(),
+      object: "image_url",
+      created: Math.floor(Date.now() / 1000),
+      model: "chroma",
+      params_used: payload,
+      data: {
+        url: uploadResult.url
+      }
+    });
+  } catch (err) {
+    return json({ error: { message: err.message } }, 500);
+  }
+}
