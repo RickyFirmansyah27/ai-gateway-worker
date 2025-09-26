@@ -144,7 +144,6 @@ export async function handleImageGenerationV2(request, env) {
       object: "image_url",
       created: Math.floor(Date.now() / 1000),
       model: config.models.imagev2.displayName,
-      params_used: payload,
       data: {
         url: uploadResult.url
       }
