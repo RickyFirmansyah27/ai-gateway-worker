@@ -8,98 +8,127 @@ function json(data, status = 200) {
 
 // 🔢 Token estimator sederhana
 function estimateTokens(text) {
-   if (!text) return 0;
-   // anggap 1 token ≈ 4 karakter (estimasi OpenAI)
-   return Math.ceil(text.length / 4);
- }
+  if (!text) return 0;
+  // anggap 1 token ≈ 4 karakter (estimasi OpenAI)
+  return Math.ceil(text.length / 4);
+}
 
 // 🖼️ Base64 converter untuk binary data (aman dari call stack overflow)
 async function convertToBase64(arrayBuffer) {
-   try {
-     if (!arrayBuffer) {
-       throw new Error('ArrayBuffer is required');
-     }
+  try {
+    if (!arrayBuffer) {
+      throw new Error('ArrayBuffer is required');
+    }
 
-     // Convert ArrayBuffer to Uint8Array
-     const bytes = new Uint8Array(arrayBuffer);
-     let binaryString = '';
+    // Convert ArrayBuffer to Uint8Array
+    const bytes = new Uint8Array(arrayBuffer);
+    let binaryString = '';
 
-     console.log(`Converting ${bytes.length} bytes to base64...`);
+    console.log(`Converting ${bytes.length} bytes to base64...`);
 
-     // Build binary string character by character to avoid call stack overflow
-     // Process in smaller chunks for better memory management
-     const chunkSize = 16384; // 16KB chunks for better performance
+    // Build binary string character by character to avoid call stack overflow
+    // Process in smaller chunks for better memory management
+    const chunkSize = 16384; // 16KB chunks for better performance
 
-     for (let i = 0; i < bytes.length; i += chunkSize) {
-       const end = Math.min(i + chunkSize, bytes.length);
-       const chunk = bytes.subarray(i, end);
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const end = Math.min(i + chunkSize, bytes.length);
+      const chunk = bytes.subarray(i, end);
 
-       for (let j = 0; j < chunk.length; j++) {
-         binaryString += String.fromCharCode(chunk[j]);
-       }
-     }
+      for (let j = 0; j < chunk.length; j++) {
+        binaryString += String.fromCharCode(chunk[j]);
+      }
+    }
 
-     // Convert binary string to base64
-     const base64String = btoa(binaryString);
+    // Convert binary string to base64
+    const base64String = btoa(binaryString);
 
-     console.log(`Base64 conversion successful. Length: ${base64String.length}`);
-     return base64String;
+    console.log(`Base64 conversion successful. Length: ${base64String.length}`);
+    return base64String;
 
-   } catch (error) {
-     console.error('Base64 conversion failed:', error);
-     throw new Error(`Failed to convert to base64: ${error.message}`);
-   }
- }
+  } catch (error) {
+    console.error('Base64 conversion failed:', error);
+    throw new Error(`Failed to convert to base64: ${error.message}`);
+  }
+}
 
 // 🖼️ Helper untuk handle binary response dari image API
 async function handleBinaryImageResponse(response) {
-   try {
-     if (!response.ok) {
-       const errorText = await response.text();
-       throw new Error(`API error ${response.status}: ${errorText}`);
-     }
+  try {
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API error ${response.status}: ${errorText}`);
+    }
 
-     const contentType = response.headers.get('content-type');
-     console.log('Response content-type:', contentType);
+    const contentType = response.headers.get('content-type');
+    console.log('Response content-type:', contentType);
 
-     // Get raw binary data
-     const arrayBuffer = await response.arrayBuffer();
-     console.log('Received binary data size:', arrayBuffer.byteLength);
+    // Get raw binary data
+    const arrayBuffer = await response.arrayBuffer();
+    console.log('Received binary data size:', arrayBuffer.byteLength);
 
-     // Convert to base64
-     const base64String = await convertToBase64(arrayBuffer);
+    // Convert to base64
+    const base64String = await convertToBase64(arrayBuffer);
 
-     return base64String;
+    return base64String;
 
-   } catch (error) {
-     console.error('Binary response handling failed:', error);
-     throw error;
-   }
- }
- 
- // 📝 Helper untuk format chat completion response
- function formatChatCompletionResponse(model, generatedText, promptTokens, completionTokens, totalTokens) {
-   return {
-     id: "chatcmpl-" + crypto.randomUUID(),
-     object: "chat.completion",
-     created: Math.floor(Date.now() / 1000),
-     model: model,
-     choices: [
-       {
-         index: 0,
-         message: {
-           role: "assistant",
-           content: generatedText,
-         },
-         finish_reason: "stop",
-       },
-     ],
-     usage: {
-       prompt_tokens: promptTokens,
-       completion_tokens: completionTokens,
-       total_tokens: totalTokens,
-     },
-   };
- }
- 
- export { json, estimateTokens, convertToBase64, handleBinaryImageResponse, formatChatCompletionResponse };
+  } catch (error) {
+    console.error('Binary response handling failed:', error);
+    throw error;
+  }
+}
+
+// 📝 Helper untuk format chat completion response
+function formatChatCompletionResponse(model, generatedText, promptTokens, completionTokens, totalTokens) {
+  return {
+    id: "chatcmpl-" + crypto.randomUUID(),
+    object: "chat.completion",
+    created: Math.floor(Date.now() / 1000),
+    model: model,
+    choices: [
+      {
+        index: 0,
+        message: {
+          role: "assistant",
+          content: generatedText,
+        },
+        finish_reason: "stop",
+      },
+    ],
+    usage: {
+      prompt_tokens: promptTokens,
+      completion_tokens: completionTokens,
+      total_tokens: totalTokens,
+    },
+  };
+}
+
+export function sanitizeMessages(messages) {
+  if (!Array.isArray(messages)) {
+    throw new Error('Messages must be an array');
+  }
+
+  return messages.map(m => ({
+    role: m.role,
+    content: Array.isArray(m.content) ? m.content.join(' ') : String(m.content || ''),
+  }));
+}
+
+export function formatChatResponse(generatedText, modelDisplayName, usage) {
+  return {
+    id: 'chatcmpl-' + crypto.randomUUID(),
+    object: 'chat.completion',
+    created: Math.floor(Date.now() / 1000),
+    model: modelDisplayName,
+    choices: [{
+      index: 0,
+      message: {
+        role: 'assistant',
+        content: generatedText,
+      },
+      finish_reason: 'stop',
+    }],
+    usage,
+  };
+}
+
+export { json, estimateTokens, convertToBase64, handleBinaryImageResponse, formatChatCompletionResponse };
