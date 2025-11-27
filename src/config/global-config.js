@@ -28,7 +28,7 @@ export const config = {
       displayName: 'imaginary-v2-instruct',
     },
     web_search: {
-      modelId: 'models/gemini-2.5-pro',
+      modelId: 'models/gemini-3-pro-preview',
       displayName: 'imaginary-v1-instruct',
     },
   },
