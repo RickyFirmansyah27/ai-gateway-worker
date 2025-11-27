@@ -1,4 +1,4 @@
-import { SystemPromptModel } from '../helper/sytem-prompt.js';
+import { SystemPromptModel } from '../helper/system-prompt.js';
 import { estimateTokens, json } from '../helper/utils.js';
 import { config } from '../config/global-config.js';
 
@@ -27,18 +27,20 @@ export async function handleChatCompletions(request, env) {
     })),
   ];
 
-  const options = {
-    messages: sanitizedMessages,
-    max_tokens: body.max_tokens || config.defaults.chat.maxTokens,
-    temperature: body.temperature ?? config.defaults.chat.temperature,
-    top_p: body.top_p ?? config.defaults.chat.topP,
-    presence_penalty: body.presence_penalty ?? config.defaults.chat.presencePenalty,
-    frequency_penalty: body.frequency_penalty ?? config.defaults.chat.frequencyPenalty,
-  };
 
   // 🧠 Call Cloudflare AI model default
-  const aiResponse = await env.AI.run(model, options);
-  const generatedText = aiResponse.response;
+  const aiResponse = await env.AI.run(model, {
+    instructions: SystemPromptModel(config.models.text.displayName),
+    input: sanitizedMessages,
+  });
+
+  const outputMessage = aiResponse.output;
+  const message =  outputMessage?.find(item => item.type === "message");
+  const generatedText = message?.content
+    ?.filter(c => c.type === "output_text")
+    ?.map(c => c.text)
+    ?.join("\n") ?? "";
+
 
   // 🔢 Estimasi token
   const promptText = sanitizedMessages.map(m => m.content).join(" ");

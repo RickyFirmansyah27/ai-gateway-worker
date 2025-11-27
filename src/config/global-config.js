@@ -16,7 +16,7 @@ export const config = {
   },
   models: {
     text: {
-      modelId: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+      modelId: '@cf/openai/gpt-oss-120b',
       displayName: 'imaginary-v1-instruct',
     },
     image: {
