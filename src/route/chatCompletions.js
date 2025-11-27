@@ -1,5 +1,5 @@
 import { SystemPromptModel } from '../helper/system-prompt.js';
-import { estimateTokens, json } from '../helper/utils.js';
+import { estimateTokens, json, formatChatCompletionResponse } from '../helper/utils.js';
 import { config } from '../config/global-config.js';
 
 export async function handleChatCompletions(request, env) {
@@ -48,25 +48,5 @@ export async function handleChatCompletions(request, env) {
   const completion_tokens = estimateTokens(generatedText);
   const total_tokens = prompt_tokens + completion_tokens;
 
-  return json({
-    id: "chatcmpl-" + crypto.randomUUID(),
-    object: "chat.completion",
-    created: Math.floor(Date.now() / 1000),
-    model: config.models.text.displayName,
-    choices: [
-      {
-        index: 0,
-        message: {
-          role: "assistant",
-          content: generatedText,
-        },
-        finish_reason: "stop",
-      },
-    ],
-    usage: {
-      prompt_tokens,
-      completion_tokens,
-      total_tokens,
-    },
-  });
+  return json(formatChatCompletionResponse(config.models.text.displayName, generatedText, prompt_tokens, completion_tokens, total_tokens));
 }

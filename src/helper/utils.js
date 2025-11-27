@@ -76,6 +76,30 @@ async function handleBinaryImageResponse(response) {
      throw error;
    }
  }
-
-
-export { json, estimateTokens, convertToBase64, handleBinaryImageResponse };
+ 
+ // 📝 Helper untuk format chat completion response
+ function formatChatCompletionResponse(model, generatedText, promptTokens, completionTokens, totalTokens) {
+   return {
+     id: "chatcmpl-" + crypto.randomUUID(),
+     object: "chat.completion",
+     created: Math.floor(Date.now() / 1000),
+     model: model,
+     choices: [
+       {
+         index: 0,
+         message: {
+           role: "assistant",
+           content: generatedText,
+         },
+         finish_reason: "stop",
+       },
+     ],
+     usage: {
+       prompt_tokens: promptTokens,
+       completion_tokens: completionTokens,
+       total_tokens: totalTokens,
+     },
+   };
+ }
+ 
+ export { json, estimateTokens, convertToBase64, handleBinaryImageResponse, formatChatCompletionResponse };
